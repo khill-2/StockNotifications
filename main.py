@@ -7,23 +7,31 @@ import smtplib
 from email.message import EmailMessage
 
 load_dotenv()
-TWILIO_ACCOUNT_SID = os.getenv('TWILIO_SID')
-TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
-TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER')
-TO_PHONE_NUMBER = os.getenv('TWILIO_TO')
 
 def load_portfolio(filename='portfolio.json'):
     with open(filename, 'r') as file:
         return json.load(file)
     
 def fetch_open_and_close_prices(symbols):
-    tickers = yf.download(" ".join(symbols), period='1d', interval='1m', group_by='ticker', progress=False)
+    today = datetime.now().date()
     result = {}
+
     for sym in symbols:
-        data = tickers[sym] if len(symbols) > 1 else tickers
-        open_price = data['Open'].iloc[0]
-        close_price = data['Close'].iloc[-1]
+        # Get the last 2 days (so today is included)
+        data = yf.download(sym, period='2d', interval='1d', auto_adjust=False, progress=False)
+
+        # Fix timezone issues by ensuring index is just the date
+        data.index = pd.to_datetime(data.index).date
+
+        if today in data.index:
+            row = data.loc[today]
+        else:
+            raise Exception(f"No data available for {sym} on {today}. Try running the script later (after 4:30 PM ET).")
+
+        open_price = row["Open"]
+        close_price = row["Close"]
         result[sym] = (open_price, close_price)
+
     return result
 
 def calculate_daily_pl(portfolio, price_data):
@@ -41,12 +49,6 @@ def calculate_daily_pl(portfolio, price_data):
     return total_pl, breakdown
 
 def send_sms(message):
-    # client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-    # client.messages.create(
-    #     body=message,
-    #     from_=TWILIO_PHONE_NUMBER,
-    #     to=TO_PHONE_NUMBER
-    # )
     sender = os.getenv('GMAIL_ADDRESS')
     app_password = os.getenv('GMAIL_APP_PASSWORD')
     recepient = os.getenv('TO_SMS')
