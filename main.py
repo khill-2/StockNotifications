@@ -1,9 +1,10 @@
 import yfinance as yf
-from twilio.rest import Client
 from datetime import datetime
 import os
 import json
 from dotenv import load_dotenv
+import smtplib
+from email.message import EmailMessage
 
 load_dotenv()
 TWILIO_ACCOUNT_SID = os.getenv('TWILIO_SID')
