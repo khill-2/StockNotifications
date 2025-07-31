@@ -20,7 +20,7 @@ def fetch_open_and_close_prices(symbols):
     result = {}
     for sym in symbols:
         data = tickers[sym] if len(symbols) > 1 else tickers
-        open+_price = data['Open'].iloc[0]
+        open_price = data['Open'].iloc[0]
         close_price = data['Close'].iloc[-1]
         result[sym] = (open_price, close_price)
     return result
