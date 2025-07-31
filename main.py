@@ -35,7 +35,7 @@ def calculate_daily_pl(portfolio, price_data):
         open_price, close_price = price_data[symbol]
         pl = (close_price - open_price) * shares
         total_pl += pl
-        breakdown.append(f"{symbol}: ${pl:.2f} ({shares} shares, Open ${open_price:.2f} → Close ${close_price:.2f})")
+        breakdown.append(f"{symbol}: ${pl:.2f} (Open: ${open_price:.2f} → Close: ${close_price:.2f})")
 
     return total_pl, breakdown
 
