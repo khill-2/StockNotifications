@@ -40,12 +40,25 @@ def calculate_daily_pl(portfolio, price_data):
     return total_pl, breakdown
 
 def send_sms(message):
-    client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-    client.messages.create(
-        body=message,
-        from_=TWILIO_PHONE_NUMBER,
-        to=TO_PHONE_NUMBER
-    )
+    # client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+    # client.messages.create(
+    #     body=message,
+    #     from_=TWILIO_PHONE_NUMBER,
+    #     to=TO_PHONE_NUMBER
+    # )
+    sender = os.getenv('GMAIL_ADDRESS')
+    app_password = os.getenv('GMAIL_APP_PASSWORD')
+    recepient = os.getenv('TO_SMS')
+
+    msg = EmailMessage()
+    msg.set_content(message)
+    msg["From"] = sender
+    msg["To"] = recepient
+    msg["Subject"] = ""
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login(sender, app_password)
+        server.send_message(msg)
 
 def main():
     portfolio = load_portfolio()
