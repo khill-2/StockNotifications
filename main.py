@@ -39,3 +39,28 @@ def calculate_daily_pl(portfolio, price_data):
 
     return total_pl, breakdown
 
+def send_sms(message):
+    client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+    client.messages.create(
+        body=message,
+        from_=TWILIO_PHONE_NUMBER,
+        to=TO_PHONE_NUMBER
+    )
+
+def main():
+    portfolio = load_portfolio()
+    symbols = []
+    for stock in portfolio:
+        symbols.append(stock["symbol"])
+    price_data = fetch_open_and_close_prices(symbols)
+    total_pl, breakdown = calculate_daily_pl(portfolio, price_data)
+
+    today = datetime.now().strftime("%Y-%m-%d")
+    emoji = "📈" if total_pl >= 0 else "📉"
+    message = f"Stock Daily Report – {today}\n{emoji} Net P/L: ${total_pl:.2f}\n\n" + "\n".join(breakdown)
+
+    send_sms(message)
+    print("SMS sent successfully!", message)
+
+if __name__ == "__main__":
+    main()
