@@ -1,0 +1,12 @@
+[
+    {
+        "symbol": "SPY",
+        "shares": 12,
+        "cost_basis": 5307.69
+    },
+    {
+        "symbol": "SWPPX",
+        "shares": 33.959,
+        "cost_basis": 3296.04
+    }
+]
